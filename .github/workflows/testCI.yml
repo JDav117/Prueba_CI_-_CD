@@ -1,0 +1,61 @@
+name: CI & Despliegue a GitHub Pages
+
+on:
+    push:
+        branches: [main, frontend]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+concurrency:
+            group: "CI-CD-GHPages"
+            cancel-in-progress: true
+
+
+jobs:  
+    verificar_codigo:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout del repositorio
+              uses: actions/checkout@v4
+
+            - name: Mostrar archivos (Opcional, para depuración)
+              run: ls -R
+
+            - name: Verificar archivos principales
+              run: |
+                    if [ ! -f "index.html" ]; then
+                        echo "Error: index.html no encontrado. ¡CI Basico Superado!"
+                        exit 1
+                    fi
+                    if [ ! -d "src" ]; then
+                        echo "Error: Directorio src no encontrado!"
+                        exit 1
+                    fi
+                    echo "Todos los archivos principales están presentes."
+    desplegar_github_pages:
+        needs: verificar_codigo
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deploy-to-github-pages.outputs.page_url }}
+
+        permissions:
+            contents: read
+            pages: write
+            id-token: write
+
+        steps:
+            - name: Checkout del repositorio
+              uses: actions/checkout@v4
+            - name: Configurar Github Pages
+              uses: actions/configure-pages@v5
+            - name: Subir artifactos de despliegue
+              uses: actions/upload-pages-artifact@v3    
+              with:
+                path: './'
+
+            - name: iniciar despliegue a pages
+              id: deployment
+              uses: actions/deploy-pages@v4
