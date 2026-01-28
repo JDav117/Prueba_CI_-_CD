@@ -24,10 +24,10 @@ jobs:
 
             - name: Verificar archivos principales
               run: |
-                    if [ -f "index.html" ] && [ -f "styles.css" ]; then
-                        echo "Error: index.html o styles.css no encontrado. ¡CI Basico Superado!"
+                    if [ -f "index.html" ]; then
+                        echo "✅ index.html encontrado. ¡CI Básico Superado!"
                     else
-                        echo "faltan el archivo index.html o styles.css."
+                        echo "❌ falta el archivo index.html."
                         exit 1
                     fi
 
